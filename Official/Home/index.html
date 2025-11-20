@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesaurus Media- Home</title>
+    <link rel="stylesheet" type="text/css"  href="../Style/Home.css">
+</head>
+<body>
+    <header>
+       <div class="header-content">
+            <div class="logo-img">
+                <img src="../images/TM logo.png ">
+            </div>
+            
+            <div class="logo">
+                <div class="logo">Thesaurus Media</div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="..\home\index.html"class="active">Home</a></li>
+                    <li><a href="..\News\news.html">News</a></li>
+                    <li><a href="..\quotes\quotes.html">Quotes</a></li>
+                    <li><a href="..\about\about.html">About & contacts</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="slideshow-container" id="slideshow"></div>
+
+        <h2 class="section-title">Latest News</h2>
+        <div class="news-grid" id="newsGrid"></div>
+    </main>
+
+    <!-- Modal for image preview -->
+    <div class="modal-overlay" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📸 Your Shareable News Image</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="preview-canvas-container">
+                <canvas id="previewCanvas"></canvas>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-download" onclick="downloadImage()">
+                    ⬇️ Download Image
+                </button>
+                <button class="modal-btn btn-share-social" onclick="shareToSocial()">
+                    🚀 Share to Social Media
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="hiddenCanvas"></canvas>
+
+    <div class="toast" id="toast">
+        <span id="toastMessage">Shared successfully!</span>
+    </div>
+
+    <script>
+        // Slideshow data 
+        const slideshowData = [
+            {
+                image: '../images/football.jpg',
+                category: 'Sports',
+                title: 'Ghana Black Stars Lose to South Korea',
+                description: 'the Black Stars, suffered a 1-0 defeat to South Korea in a friendly match at the Seoul World Cup Stadium. The lone goal was scored by Lee Tae-Seok in the 63rd minute. Despite the loss, goalkeeper Benjamin Asare impressed with a crucial penalty save against Hwang Hee-Chan. ',
+                date: '2 hours ago',
+                articleUrl: '/articles/climate-summit-agreement'
+            },
+            {
+                image: '../images/cedi.jpg',
+                category: 'Economy',
+                title: 'Cedi stability is everybody responsibility - BOG.',
+                description: 'Dr. Johnson Asiama, Governor of Bank of Ghana is urging Ghanaians to see the protection and stability of the cedi.',
+                date: '4 hours ago',
+                articleUrl: '/articles/quantum-computing-breakthrough'
+            },
+            {
+                image: '../images/trump.jpg',
+                category: 'International',
+                title: 'Saudi Crown Prince to visit US with defence,Ai,nuclear agenda',
+                description: 'A visit by Saudi Arabia de facto ruler to the White House for talks on Tuesday with U.S President.',
+                date: '6 hours ago',
+                articleUrl: '/articles/championship-upset'
+            }
+        ];
+
+        // News data
+        const newsData = [
+            {
+                category: 'Breaking',
+                title: 'Police arrests man for assulting his wife in viral video',
+                excerpt: 'A man arrested for physically assulting his wife in a viral Facebook video, at Ofankor.',
+                date: '2 hours ago',
+                image: '../images/police.jpg',
+                articleUrl: '/articles/trade-agreement'
+            },
+            {
+                category: 'Sports',
+                title: 'GFA Releases Support for Women League',
+                excerpt: 'The Ghana Football Association has released the first tranche of financial support to clubs participating in the 2025/26 Malta Guinness Women Premier League. Each of the 20 Premier League clubs received GH₵25,000, accumulating to a total of GHc500,000 ',
+                date: '4 hours ago',
+                image: '../images/women.jpg',
+                articleUrl: '/articles/tech-earnings'
+            },
+            {
+                category: 'International',
+                title: 'US-Saudi Relations',
+                excerpt: 'US President Donald Trump has designated Saudi Arabia as a major non-NATO ally, with agreements on military cooperation and investments',
+                date: '6 hours ago',
+                image: '../images/trump.jpg',
+                articleUrl: '/articles/energy-storage'
+            },
+            {
+                category: 'Crime',
+                title: 'NAIMOS team gets involved in a car accident',
+                excerpt: 'A NAIMOS Officer was killed, and four others were injured in a crash during anti-galamsey operation.',
+                date: '8 hours ago',
+                image: '../images/naimos.jpg',
+                articleUrl: '/articles/cancer-treatment'
+            },
+            {
+                category: 'Sports',
+                title: 'Ghana suffers defeat to South Korea ',
+                excerpt: 'Ghana suffers defeat to South Korea by a goal difference whiles it ends the Asia tour',
+                date: '10 hours ago',
+                image: '../images/football.jpg',
+                articleUrl: '/articles/world-record'
+            },
+            {
+                category: 'Science',
+                title: 'Mars Mission Discovers Evidence of Ancient Water Systems',
+                excerpt: 'Latest rover findings suggest Mars once had extensive river networks and possibly supported microbial life.',
+                date: '12 hours ago',
+                image: '../images/mars.jpg',
+                articleUrl: '/articles/mars-discovery'
+            }
+        ];
+
+        // Initialize slideshow
+        let currentSlide = 0;
+        const slideshowContainer = document.getElementById('slideshow');
+
+        // Create slides
+        slideshowData.forEach((slide, index) => {
+            const slideElement = document.createElement('div');
+            slideElement.className = `slide ${index === 0 ? 'active' : ''}`;
+            slideElement.style.backgroundImage = `url('${slide.image}')`;
+            slideElement.innerHTML = `
+                <div class="slide-content">
+                    <span class="slide-category">${slide.category}</span>
+                    <h2 class="slide-title">${slide.title}</h2>
+                    <p class="slide-description">${slide.description}</p>
+                    <p class="slide-date">📅 ${slide.date}</p>
+                </div>
+            `;
+            slideElement.style.cursor = 'pointer';
+            slideElement.onclick = () => window.location.href = slide.articleUrl;
+            slideshowContainer.appendChild(slideElement);
+        });
+
+        // Create navigation
+        const navDiv = document.createElement('div');
+        navDiv.className = 'slide-nav';
+        navDiv.innerHTML = `
+            <button onclick="changeSlide(-1)">‹</button>
+            <button onclick="changeSlide(1)">›</button>
+        `;
+        slideshowContainer.appendChild(navDiv);
+
+        // Create indicators
+        const indicatorsDiv = document.createElement('div');
+        indicatorsDiv.className = 'slide-indicators';
+        indicatorsDiv.id = 'indicators';
+        slideshowContainer.appendChild(indicatorsDiv);
+
+        const indicatorsContainer = document.getElementById('indicators');
+        slideshowData.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
+            indicator.onclick = () => goToSlide(index);
+            indicatorsContainer.appendChild(indicator);
+        });
+
+        const slides = document.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            indicators[currentSlide].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        function goToSlide(n) {
+            showSlide(n);
+        }
+
+        // Auto-advance slideshow
+        setInterval(() => {
+            changeSlide(1);
+        }, 5000);
+
+        // Render news cards
+        const newsGrid = document.getElementById('newsGrid');
+        newsData.forEach(news => {
+            const card = document.createElement('div');
+            card.className = 'news-card';
+            card.onclick = () => window.location.href = news.articleUrl;
+            card.innerHTML = `
+                <div class="news-image" style="background-image: url('${news.image}')"></div>
+                <div class="news-content">
+                    <span class="news-category">${news.category}</span>
+                    <h3 class="news-title">${news.title}</h3>
+                    <p class="news-excerpt">${news.excerpt}</p>
+                    <div class="news-meta">
+                        <span class="news-date">${news.date}</span>
+                        <div class="share-buttons">
+                            <button class="share-btn share-facebook" onclick="event.stopPropagation(); prepareShareImage('${news.title.replace(/'/g, "\\'")}', '${news.excerpt.replace(/'/g, "\\'")}', '${news.category}', 'facebook')" title="Share on Facebook">f</button>
+                            <button class="share-btn share-twitter" onclick="event.stopPropagation(); prepareShareImage('${news.title.replace(/'/g, "\\'")}', '${news.excerpt.replace(/'/g, "\\'")}', '${news.category}', 'twitter')" title="Share on Twitter">𝕏</button>
+                            <button class="share-btn share-linkedin" onclick="event.stopPropagation(); prepareShareImage('${news.title.replace(/'/g, "\\'")}', '${news.excerpt.replace(/'/g, "\\'")}', '${news.category}', 'linkedin')" title="Share on LinkedIn">in</button>
+                            <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); prepareShareImage('${news.title.replace(/'/g, "\\'")}', '${news.excerpt.replace(/'/g, "\\'")}', '${news.category}', 'whatsapp')" title="Share on WhatsApp">⟳</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            newsGrid.appendChild(card);
+        });
+
+        let currentShareData = null;
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let lines = [];
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && n > 0) {
+                    lines.push(line);
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
+                }
+            }
+            lines.push(line);
+
+            lines.forEach((line, index) => {
+                ctx.fillText(line.trim(), x, y + (index * lineHeight));
+            });
+
+            return lines.length * lineHeight;
+        }
+
+        function prepareShareImage(title, excerpt, category, platform) {
+            currentShareData = { title, excerpt, category, platform };
+            
+            const canvas = document.getElementById('hiddenCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 1200;
+            canvas.height = 630;
+            
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#0f0f1e');
+            gradient.addColorStop(0.5, '#1a1a2e');
+            gradient.addColorStop(1, '#0f0f1e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.12)';
+            ctx.beginPath();
+            ctx.arc(150, 150, 200, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255, 217, 61, 0.12)';
+            ctx.beginPath();
+            ctx.arc(1050, 480, 250, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+            
+            ctx.strokeStyle = 'rgba(255, 217, 61, 0.6)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+            
+            const headerGradient = ctx.createLinearGradient(0, 0, 500, 0);
+            headerGradient.addColorStop(0, '#ff6b6b');
+            headerGradient.addColorStop(1, '#ffd93d');
+            
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.15)';
+            ctx.fillRect(50, 50, canvas.width - 100, 100);
+            
+            ctx.font = 'bold 52px Arial';
+            ctx.fillStyle = headerGradient;
+            ctx.fillText('📰 THESAURUS MEDIA', 80, 115);
+            
+            const categoryColors = {
+                'World': '#667eea',
+                'Business': '#f5576c',
+                'Technology': '#00f2fe',
+                'Health': '#38f9d7',
+                'Sports': '#fee140',
+                'Crime': '#34ed84',
+                'International':' #6bdaff;',
+                'Science': '#330867'
+            };
+            
+            const categoryColor = categoryColors[category] || '#ff6b6b';
+            ctx.fillStyle = categoryColor;
+            ctx.fillRect(80, 180, 180, 50);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(category.toUpperCase(), 95, 212);
+            
+            const lineGradient = ctx.createLinearGradient(80, 0, canvas.width - 80, 0);
+            lineGradient.addColorStop(0, '#ff6b6b');
+            lineGradient.addColorStop(0.5, '#ffd93d');
+            lineGradient.addColorStop(1, '#ff6b6b');
+            ctx.strokeStyle = lineGradient;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(80, 250);
+            ctx.lineTo(canvas.width - 80, 250);
+            ctx.stroke();
+            
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            const titleHeight = wrapText(ctx, title, 80, 310, canvas.width - 160, 58);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            ctx.font = '28px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            wrapText(ctx, excerpt, 80, 310 + titleHeight + 30, canvas.width - 160, 40);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fillRect(50, canvas.height - 110, canvas.width - 100, 60);
+            
+            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = headerGradient;
+            ctx.fillText('🔗 www.globalnews.com', 80, canvas.height - 65);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillText('Read the full story online', canvas.width - 420, canvas.height - 65);
+            
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.4)';
+            ctx.beginPath();
+            ctx.moveTo(50, 50);
+            ctx.lineTo(100, 50);
+            ctx.lineTo(50, 100);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(canvas.width - 50, canvas.height - 50);
+            ctx.lineTo(canvas.width - 100, canvas.height - 50);
+            ctx.lineTo(canvas.width - 50, canvas.height - 100);
+            ctx.closePath();
+            ctx.fill();
+            
+            const previewCanvas = document.getElementById('previewCanvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            const scale = 0.5;
+            previewCanvas.width = canvas.width * scale;
+            previewCanvas.height = canvas.height * scale;
+            
+            previewCtx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+            
+            document.getElementById('imageModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('show');
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('hiddenCanvas');
+            const link = document.createElement('a');
+            const fileName = `globalnews_${currentShareData.category.toLowerCase()}_${Date.now()}.png`;
+            
+            link.download = fileName;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            showToast('📥 Image downloaded successfully!');
+        }
+
+        function shareToSocial() {
+            const canvas = document.getElementById('hiddenCanvas');
+            
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'globalnews.png', { type: 'image/png' });
+                
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: currentShareData.title,
+                        text: currentShareData.excerpt + '\n\nRead more at: www.globalnews.com'
+                    })
+                    .then(() => {
+                        showToast('🎉 Shared successfully!');
+                        closeModal();
+                    })
+                    .catch((error) => {
+                        console.log('Share failed:', error);
+                        fallbackShare();
+                    });
+                } else {
+                    fallbackShare();
+                }
+            });
+        }
+
+        function fallbackShare() {
+            const platform = currentShareData.platform;
+            const text = encodeURIComponent(currentShareData.title + '\n\n' + currentShareData.excerpt + '\n\nRead more: www.globalnews.com');
+            const url = encodeURIComponent(window.location.href);
+            
+            let shareUrl;
+            switch(platform) {
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${text}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+                showToast('📤 Opening share dialog... Download the image to attach it!');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') {
+                closeModal();
+            }
+        });
+
+        // Add hover effect to news cards
+        document.querySelectorAll('.news-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
